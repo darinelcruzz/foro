@@ -31,4 +31,19 @@ class User extends Authenticatable
     {
       return $this->hasMany(Post::class);
     }
+
+    function comments()
+    {
+      return $this->hasMany(Comment::class);
+    }
+
+    function comment(Post $post, $message)
+    {
+      $comment = new Comment([
+        'comment' => $message,
+        'post_id' => $post->id,
+      ]);
+
+      $this->comments()->save($comment);
+    }
 }
