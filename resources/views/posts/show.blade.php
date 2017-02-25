@@ -3,7 +3,7 @@
 @section('content')
   <h1> {{ $post->title }} </h1>
 
-  <p> {{ $post->content }} </p>
+  {!! $post->safe_html_content !!}
 
   <p> {{ $post->user->name}} </p>
 
@@ -23,7 +23,8 @@
 
   @foreach ($post->latestComments as $comment)
     <article class="{{ $comment->answer ? 'answer' : '' }}">
-      {{ $comment->comment }}
+
+      {!! $comment->safe_html_content !!}
 
       @if (Gate::allows('accept', $comment) && !$comment->answer)
         {{!! Form::open(['route' => ['comments.accept', $comment], 'method' => 'POST']) !!}}
@@ -32,4 +33,6 @@
       @endif
     </article>
   @endforeach
+
+  {{-- $post->latestComments->links() --}}
 @endsection
