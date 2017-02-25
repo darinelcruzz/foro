@@ -7,17 +7,23 @@
 
   <p> {{ $post->user->name}} </p>
 
+  @if (auth()->check() && !auth()->user()->isSubscribedTo($post))
+    {!! Form::open(['route' => ['posts.subscribe', $post], 'method' => 'POST']) !!}
+      <button type="submit">Suscribirse al post</button>
+    {!! Form::close() !!}}
+  @endif
+
   <h4>Comentarios</h4>
 
-  {{!! Form::open(['route' => ['comments.store', $post], 'method' => 'POST']) !!}}
+  {!! Form::open(['route' => ['comments.store', $post], 'method' => 'POST']) !!}
 
-    {{!! Field::textarea('comment') !!}}
+    {!! Field::textarea('comment') !!}
 
     <button type="submit">
       Publicar comentario
     </button>
 
-  {{!! Form::close() !!}}
+  {!! Form::close() !!}
 
   {{-- todo: Paginate comments --}}
 

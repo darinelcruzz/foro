@@ -22,3 +22,9 @@ Route::post('comments/{comment}/accept', [
   'uses' => 'CommentController@accept',
   'as' => 'comments.accept',
 ]);
+
+// Subscriptions
+Route::post('posts/{post}/subscribe', [
+  'uses' => 'SubscriptionController@subscribe',
+  'as' => 'posts.subscribe'
+]);
