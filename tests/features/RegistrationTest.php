@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Mail;
 
 class RegistrationTest extends FeatureTestCase
 {
-  function test_a_user_can_create_an_account()
+  function test_a_guest_user_can_create_an_account()
   {
     Mail::fake();
 
@@ -39,14 +39,26 @@ class RegistrationTest extends FeatureTestCase
       return $mail->token->id == $token->id;
     });
 
-    /**
-    * @todo: finish this feature!
-    */
-
-    return;
-    
     $this->seeRouteIs('register_confirmation')
         ->see('Gracias por registrarte')
         ->see('Envíamos a tu email un enlace para que inicies sesión');
   }
+
+  public function test_a_guest_user_can_create_an_account_without_an_email()
+  {
+    // When
+    $this->visitRoute('register')
+        ->type('darinelcruzz', 'username')
+        ->type('Darinel', 'first_name')
+        ->type('Cruz', 'last_name')
+        ->press('Regístrate');
+
+    $this->seeErrors([
+      'email' => 'El campo correo electrónico es obligatorio'
+    ]);
+  }
+
+  /**
+  * @todo add the other validations
+  */
 }

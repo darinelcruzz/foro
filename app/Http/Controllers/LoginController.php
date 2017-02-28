@@ -6,28 +6,25 @@ use App\User;
 use App\Token;
 use Illuminate\Http\Request;
 
-class RegisterController extends Controller
+class LoginController extends Controller
 {
   public function create()
   {
-    return view('register/create');
+    return view('login.create');
   }
 
   public function store(Request $request)
   {
     $this->validate($request, [
-      'email' => 'required'
+      'email' => 'required|email|exists:users'
     ]);
 
-    $user = User::create($request->all());
+    $user = User::where('email', $request->get('email'))->first();
 
     Token::generateFor($user)->sendByEmail();
 
-    return redirect()->route('register_confirmation');
-  }
+    alert('Envíamos a tu email un enlace para que inicies sesión');
 
-  public function confirm()
-  {
-    return view('register/confirm');
+    return back();
   }
 }
