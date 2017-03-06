@@ -2,13 +2,13 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Model;
 use GrahamCampbell\Markdown\Facades\Markdown;
 
 class Post extends Model
 {
-    protected $fillable = ['title', 'content'];
+    protected $fillable = ['title', 'content', 'category_id'];
 
     protected $casts = [
       'pending' => 'boolean'
@@ -17,6 +17,11 @@ class Post extends Model
     public function user()
     {
       return $this->belongsTo(User::class);
+    }
+
+    public function category()
+    {
+      return $this->belongsTo(Category::class);
     }
 
     function comments()
