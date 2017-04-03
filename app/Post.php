@@ -61,4 +61,14 @@ class Post extends Model
             $query->where('category_id', $category->id);
         }
     }
+
+    public function scopePending($query)
+    {
+        $query->where('pending', true);
+    }
+
+    public function scopeCompleted($query)
+    {
+        $query->where('pending', false);
+    }
 }
