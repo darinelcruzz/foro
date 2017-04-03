@@ -18,6 +18,37 @@ class PostsListTest extends FeatureTestCase
             ->seePageIs($post->url);
     }
 
+    public function test_a_user_can_see_posts_filtered_by_category()
+    {
+        $laravel = factory(\App\Category::class)->create([
+            'name' => 'Laravel', 'slug' => 'laravel'
+        ]);
+
+        $vue = factory(\App\Category::class)->create([
+            'name' => 'Vue.js', 'slug' => 'vue-js'
+        ]);
+
+        $laravelPost = factory(\App\Post::class)->create([
+            'title' => 'Post de Laravel',
+            'category_id' => $laravel->id
+        ]);
+
+        $vuePost = factory(\App\Post::class)->create([
+            'title' => 'Post de Vue.js',
+            'category_id' => $vue->id
+        ]);
+
+        $this->visit('/')
+            ->see($laravelPost->title)
+            ->see($vuePost->title)
+            ->within('.categories', function () {
+                $this->click('Laravel');
+            })
+            ->seeInElement('h1', 'Posts de Laravel')
+            ->see($laravelPost->title)
+            ->dontSee($vuePost->title);
+    }
+
     public function test_posts_are_being_paginated()
     {
       // Having
