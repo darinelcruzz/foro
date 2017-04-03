@@ -5,15 +5,7 @@
       {{ $category->exists ? 'Posts de ' . $category->name : 'Posts' }}
   </h1>
 
-  <ul>
-    @foreach ($posts as $post)
-      <li>
-        <a href="{{ $post->url }}">
-          {{ $post->title }}
-        </a>
-      </li>
-    @endforeach
-  </ul>
+  @each('posts.item', $posts, 'post')
 
   {{ $posts->render() }}
   {!! Menu::make($categoryItems, 'nav categories') !!}
