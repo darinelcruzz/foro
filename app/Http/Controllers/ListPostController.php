@@ -6,27 +6,24 @@ use Illuminate\Http\Request;
 use App\Post;
 use App\Category;
 
-class PostController extends Controller
+class ListPostController extends Controller
 {
-  public function index(Category $category = null, Request $request)
+  public function __invoke(Category $category = null, Request $request)
   {
     $routeName = $request->route()->getName();
 
+    list($orderColumn, $orderDirection) = $this->getListOrder($request->get('orden'));
+
     $posts = Post::orderBy('created_at', 'DESC')
             ->scopes($this->getListScopes($category, $request))
+            ->orderBy($orderColumn, $orderDirection)
             ->paginate();
+
+    $posts->appends(request()->intersect(['orden']));
 
     $categoryItems = $this->getCategoryItems();
 
     return view('posts.index', compact('posts', 'category', 'categoryItems'));
-  }
-
-  public function show(Post $post, $slug) {
-
-    if ($post->slug != $slug) {
-      return redirect($post->url, 301);
-    }
-    return view('posts.show', compact('post'));
   }
 
   protected function getCategoryItems()
@@ -57,5 +54,18 @@ class PostController extends Controller
       }
 
       return $scopes;
+  }
+
+  protected function getListOrder($order)
+  {
+      if ($order == 'recientes') {
+          return ['created_at', 'desc'];
+      }
+
+      if ($order == 'antiguos') {
+          return ['created_at', 'asc'];
+      }
+
+      return ['created_at', 'asc'];
   }
 }
