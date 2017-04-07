@@ -11,5 +11,6 @@
             <span class="label label-success">Completado</span>
         @endif
     </p>
+    
     <hr>
 </article>

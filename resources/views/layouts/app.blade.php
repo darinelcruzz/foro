@@ -13,6 +13,10 @@
     <!-- Styles -->
     <link href="{{ mix('/css/app.css') }}" rel="stylesheet">
 
+    <style>
+        .active { font-weight: bold; }
+    </style>
+
     <!-- Scripts -->
     <script>
         window.Laravel = <?php echo json_encode([
@@ -43,7 +47,7 @@
                 <div class="collapse navbar-collapse" id="app-navbar-collapse">
                     <!-- Left Side Of Navbar -->
                     <ul class="nav navbar-nav">
-                        &nbsp;
+                        {!! Menu::make(trans('menu.main'), 'nav navbar-nav') !!}
                     </ul>
 
                     <!-- Right Side Of Navbar -->

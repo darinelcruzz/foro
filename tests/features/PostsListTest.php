@@ -1,6 +1,7 @@
 <?php
 
 use App\Post;
+use App\Category;
 use Carbon\Carbon;
 
 class PostsListTest extends FeatureTestCase
@@ -20,20 +21,20 @@ class PostsListTest extends FeatureTestCase
 
     public function test_a_user_can_see_posts_filtered_by_category()
     {
-        $laravel = factory(\App\Category::class)->create([
+        $laravel = factory(Category::class)->create([
             'name' => 'Laravel', 'slug' => 'laravel'
         ]);
 
-        $vue = factory(\App\Category::class)->create([
+        $vue = factory(Category::class)->create([
             'name' => 'Vue.js', 'slug' => 'vue-js'
         ]);
 
-        $laravelPost = factory(\App\Post::class)->create([
+        $laravelPost = factory(Post::class)->create([
             'title' => 'Post de Laravel',
             'category_id' => $laravel->id
         ]);
 
-        $vuePost = factory(\App\Post::class)->create([
+        $vuePost = factory(Post::class)->create([
             'title' => 'Post de Vue.js',
             'category_id' => $vue->id
         ]);
@@ -49,7 +50,7 @@ class PostsListTest extends FeatureTestCase
             ->dontSee($vuePost->title);
     }
 
-    public function  test_a_user_can_see_posts_filtered_by_status()
+    public function test_a_user_can_see_posts_filtered_by_status()
     {
         $pendingPost = factory(Post::class)->create([
             'title' => 'Post pendiente',
@@ -68,6 +69,37 @@ class PostsListTest extends FeatureTestCase
         $this->visitRoute('posts.completed')
             ->see($completedPost->title)
             ->dontSee($pendingPost->title);
+    }
+
+    function test_a_user_can_see_posts_filtered_by_status_and_category()
+    {
+        $laravel = factory(Category::class)->create([
+            'name' => 'Categoria de Laravel', 'slug' => 'laravel'
+        ]);
+        $vue = factory(Category::class)->create([
+            'name' => 'Vue.js', 'slug' => 'vue-js'
+        ]);
+        $pendingLaravelPost = factory(Post::class)->create([
+            'title' => 'Post pendiente de Laravel',
+            'category_id' => $laravel->id,
+            'pending' => true,
+        ]);
+        $pendingVuePost = factory(Post::class)->create([
+            'title' => 'Post pendiente de Vue.js',
+            'category_id' => $vue->id,
+            'pending' => true,
+        ]);
+        $completedPost = factory(Post::class)->create([
+            'title' => 'Post completado',
+            'pending' => false,
+        ]);
+        $this->visitRoute('posts.index')
+            ->click('Posts pendientes')
+            ->click('Categoria de Laravel')
+            ->seePageIs('posts-pendientes/laravel')
+            ->see($pendingLaravelPost->title)
+            ->dontSee($completedPost->title)
+            ->dontSee($pendingVuePost->title);
     }
 
     public function test_posts_are_being_paginated()

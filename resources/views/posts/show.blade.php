@@ -1,50 +1,72 @@
 @extends('layouts/app')
 
 @section('content')
-  <h1> {{ $post->title }} </h1>
+  <div class="row">
+      <div class="col-md-10">
+          <h1> {{ $post->title }} </h1>
+      </div>
+  </div>
 
-  {!! $post->safe_html_content !!}
+  <div class="row">
+      <div class="col-md-8">
+          <p>
+              Publicado por <a href="#">{{ $post->user->name }}</a>
+              {{ $post->created_at->diffForHumans() }}
+              en <a href="{{ $post->category->url }}">{{ $post->category->name }}</a>.
+              @if ($post->pending)
+                  <span class="label label-warning">Pendiente</span>
+              @else
+                  <span class="label label-success">Completado</span>
+              @endif
+          </p>
 
-  <p> {{ $post->user->name}} </p>
+          {!! $post->safe_html_content !!}
 
-  @if (auth()->check())
-    @if (!auth()->user()->isSubscribedTo($post))
-      {!! Form::open(['route' => ['posts.subscribe', $post], 'method' => 'POST']) !!}
-        <button type="submit">Suscribirse al post</button>
-      {!! Form::close() !!}}
-    @else
-      {!! Form::open(['route' => ['posts.unsubscribe', $post], 'method' => 'DELETE']) !!}
-        <button type="submit">Desuscribirse del post</button>
-      {!! Form::close() !!}}
-    @endif
-  @endif
+          @if (auth()->check())
+            @if (!auth()->user()->isSubscribedTo($post))
+              {!! Form::open(['route' => ['posts.subscribe', $post], 'method' => 'POST']) !!}
+                <button type="submit">Suscribirse al post</button>
+              {!! Form::close() !!}}
+            @else
+              {!! Form::open(['route' => ['posts.unsubscribe', $post], 'method' => 'DELETE']) !!}
+                <button type="submit">Desuscribirse del post</button>
+              {!! Form::close() !!}}
+            @endif
+          @endif
 
-  <h4>Comentarios</h4>
+          <hr>
 
-  {!! Form::open(['route' => ['comments.store', $post], 'method' => 'POST']) !!}
+          <h4>Comentarios</h4>
 
-    {!! Field::textarea('comment') !!}
+          {{-- todo: Paginate comments --}}
 
-    <button type="submit">
-      Publicar comentario
-    </button>
+          @foreach ($post->latestComments as $comment)
+            <article class="{{ $comment->answer ? 'answer' : '' }}">
+                {{-- todo: support markdown in the comments as well! --}}
 
-  {!! Form::close() !!}
+                {!! $comment->safe_html_content !!}
 
-  {{-- todo: Paginate comments --}}
+                @if (Gate::allows('accept', $comment) && !$comment->answer)
+                    {!! Form::open(['route' => ['comments.accept', $comment], 'method' => 'POST']) !!}
+                        <button type="submit">Aceptar respuesta</button>
+                    {{!! Form::close() !!}}
+                @endif
+            </article>
 
-  @foreach ($post->latestComments as $comment)
-    <article class="{{ $comment->answer ? 'answer' : '' }}">
+            <hr>
+          @endforeach
 
-      {!! $comment->safe_html_content !!}
+          {!! Form::open(['route' => ['comments.store', $post], 'method' => 'POST', 'class' => 'form']) !!}
 
-      @if (Gate::allows('accept', $comment) && !$comment->answer)
-        {{!! Form::open(['route' => ['comments.accept', $comment], 'method' => 'POST']) !!}}
-          <button type="submit">Aceptar respuesta</button>
-        {{!! Form::close() !!}}
-      @endif
-    </article>
-  @endforeach
+            {!! Field::textarea('comment', ['class' => 'form-control', 'rows' => 6, 'label' => 'Escribe un comentario']) !!}
 
-  {{-- $post->latestComments->links() --}}
+            <button type="submit" class="btn btn-primary">
+              Publicar comentario
+            </button>
+
+          {!! Form::close() !!}
+      </div>
+
+      @include('posts.sidebar')
+  </div>
 @endsection
